@@ -26,6 +26,7 @@ class AuthController{
                     password: hash,
                     address: address,
                     type: type,
+                    updatedProfile: "0",
                 });
                 await newUser.save();
 
@@ -56,18 +57,52 @@ class AuthController{
                     },
                         process.env.AppToken
                     )
-                    return res.status(200).json({
-                        success: true,
-                        data: {
-                            id: UserExist._id,
+                if (type === "Owner"){
+                        const owner = {
+                            _id: UserExist._id,
                             userName: UserExist.userName,
                             email: UserExist.email,
                             address: UserExist.address,
                             type: UserExist.type,
+                            updatedProfile: UserExist.updatedProfile,
+                            phoneNumber: UserExist.phoneNumber,
+                            DOB: UserExist.DOB,
+                            city: UserExist.city,
+                            bakeryName: UserExist.bakeryName,
+                            bakeryWebsite: UserExist.bakeryWebsite,
+                            businessHours: UserExist.businessHours,
+                            categories: UserExist.categories,
+                            Location: UserExist.Location,
+                            profilePic: UserExist.profilePic,
                             token: token
                         }
+                        return res.status(200).json({
+                            success: true,
+                            data: owner
+    
+                        });
+                } 
+                if (type !== "Owner") {
+                    const rider = {
+                            _id: UserExist._id,
+                            userName: UserExist.userName,
+                            email: UserExist.email,
+                            phoneNumber: UserExist.phoneNumber,
+                            DOB: UserExist.DOB,
+                            state: UserExist.state,
+                            city: UserExist.city,
+                            zipCode: UserExist.zipCode,
+                            profilePic: UserExist.profilePic,
+                            updatedProfile: UserExist.updatedProfile,
+                            token: token
+                        }
+                    return res.status(200).json({
+                            success: true,
+                            data: rider
+    
+                        });
 
-                    });
+                    };
                 }
                 else {
                     res.status(200).json({
@@ -114,6 +149,7 @@ class AuthController{
                     ]
                 },
                 UserData.profilePic = ( profilePic ? profilePic : UserData.profilePic)
+                UserData.updatedProfile = "1"
                 await UserData.save()
         
                 return res.status(200).json({
@@ -130,6 +166,7 @@ class AuthController{
                 UserData.city = city
                 UserData.zipCode = zipCode
                 UserData.profilePic = ( profilePic ? profilePic : UserData.profilePic)
+                UserData.updatedProfile = "1"
                 await UserData.save()
         
                 return res.status(200).json({
@@ -141,6 +178,74 @@ class AuthController{
 
         } catch (error) {
             res.status(200).json({
+                success: false,
+                message: error.message
+            })
+        }
+    }
+    
+    static createVehicleProfile = async (req, res) => {
+        try {
+            // const type = req.user.type;
+            const { type } = req.body;
+            if(type === "Rider"){
+                const { riderId, make, model, vehicleNumber, riderLisence } = req.body;
+            
+                const vehicleProfie = new vehicleModel({
+                    riderId: riderId,
+                    make: make,
+                    model: model,
+                    vehicleNumber: vehicleNumber,
+                    riderLisence: riderLisence 
+                })
+
+                const result = await vehicleProfie.save();
+                return res.status(200).json({
+                    sucess: true,
+                    msg: "Vehicle Profile is Created Successfully!"
+                })
+            } else {
+                return res.status(403).json({
+                    sucess: false,
+                    msg: "Only Riders are Allowed to Create Vehicle Profile "
+                })
+            }
+        } catch (error) {
+            console.log('Error Msg: ', error)
+            res.status(400).json({
+                success: false,
+                message: error.message
+            })
+        }
+    }
+
+    static editVehicleProfile = async (req, res) => {
+        try {
+            const { type } = req.body;
+            if(type === "Rider"){
+                const { riderId } = req.body;
+                const data = req.body;
+
+                // const updatedVehicle = await vehicleModel.findOne({riderId});
+                const updatedVehicle = await vehicleModel.findOneAndUpdate( {riderId: riderId},
+                    {$set: data},
+                    { new: true }
+                )
+                console.log("Vehicle: ",updatedVehicle)
+                return res.status(200).json({
+                    sucess: true,
+                    msg: "Vehicle Updated Successfully!",
+                    data: updatedVehicle
+                })
+            }else {
+                return res.status(403).json({
+                    sucess: false,
+                    msg: "Only Riders are Allowed to Edit Vehicle Details"
+                })
+            }
+        } catch (error) {
+            console.log('Error Msg: ', error)
+            res.status(400).json({
                 success: false,
                 message: error.message
             })

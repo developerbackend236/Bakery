@@ -58,7 +58,13 @@ const UserSchema = new mongoose.Schema({
     },
     profilePic: {
         type: String,
+    },
+    updatedProfile: {
+    type: String,
+    enum: ["0", "1"],
+    required:true
     }
+    
     
 })
 

@@ -59,6 +59,60 @@ class ProductController {
             })
         }
     }
+    
+      static GetAllProductByCatagories = async (req, res) => {
+    const { bakeryId, chooseCategory } = req.body;
+
+    if (chooseCategory == "All") {
+      const getProductbyCatagories = await Product.find({bakeryId: bakeryId}).sort({createdAt: -1});
+      res.send({
+        message: "All products",
+        getProductbyCatagories,
+      });
+    } else {
+      const getProductbyCatagories = await Product.find({
+          bakeryId: bakeryId,
+        chooseCategory: chooseCategory,
+      }).sort({createdAt: -1});
+      res.send({
+        message: "All products related to this catagory",
+        getProductbyCatagories,
+      });
+    }
+  };
+
+  static SearchProductByNameAndCategory = async (req, res) => {
+    try {
+      const { bakeryId, searchTerm } = req.body;
+
+      // Build the query object
+      const query = {
+        $or: [
+          { productName: { $regex: searchTerm, $options: "i" } }, // Match product name
+          { chooseCategory: { $regex: searchTerm, $options: "i" } }, // Match category name
+        ],
+      };
+
+        const getProducts = await Product.find({bakeryId:bakeryId, ...query}).sort({createdAt: -1});
+
+
+      if (getProducts.length === 0) {
+        return res.status(404).send({
+          message: "No products found matching the search criteria",
+        });
+      }
+
+      res.status(200).send({
+        message: "Products matching the search criteria",
+        products: getProducts,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: "Error occurred while searching for products",
+        error: error.message,
+      });
+    }
+  };
 
     static GetAllProductByBakeryID = async (req, res)=>{
         try {
