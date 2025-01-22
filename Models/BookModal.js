@@ -35,6 +35,13 @@ const BookingSchema = new mongoose.Schema({
     bookingDropImg: {
         type: String
     },
+    Location:{
+        type:{
+            type:String,
+            // required:true
+        },
+        coordinates:[]
+    },
     orderStatus:{
         type:String,
         required:true,
@@ -50,10 +57,10 @@ const BookingSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'User'
     },
-    rejectedBy: {
+    rejectedBy: [{
         type: mongoose.Types.ObjectId,
         ref: 'User'
-    },
+    }],
     TotalPrice:{
         type: String,
         required: true

@@ -7,7 +7,7 @@ class BookController{
 
     static ProductBooking = async (req, res) => {
     const productId = req.params.id;
-    const { bakeryId, availabilty, days, quantity, TotalPrice, BakeryId } = req.body;
+    const { bakeryId, availabilty, days, quantity, TotalPrice, BakeryId, Longitude, Latitude } = req.body;
 
     try {
       // You could validate and prepare the data here, but avoid sending any response early
@@ -38,6 +38,13 @@ class BookController{
         days: availabilty !== "daily" ? days : "",
         subscriberId: req.user._id,
         BakeryId,
+        Location: Location = {
+            type:"Point",
+            coordinates:[
+                parseFloat(Longitude),
+                parseFloat(Latitude)
+            ]
+        },
         TotalPrice,
         orderStatus: "Pending",
       });

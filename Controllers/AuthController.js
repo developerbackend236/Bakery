@@ -92,6 +92,7 @@ class AuthController{
                             state: UserExist.state,
                             city: UserExist.city,
                             zipCode: UserExist.zipCode,
+                            Location: UserExist.Location,
                             profilePic: UserExist.profilePic,
                             updatedProfile: UserExist.updatedProfile,
                             token: token
@@ -165,6 +166,13 @@ class AuthController{
                 UserData.state = state
                 UserData.city = city
                 UserData.zipCode = zipCode
+                UserData.Location = {
+                    type:"Point",
+                    coordinates:[
+                        parseFloat(Longtitude),
+                        parseFloat(Latitude)
+                    ]
+                },
                 UserData.profilePic = ( profilePic ? profilePic : UserData.profilePic)
                 UserData.updatedProfile = "1"
                 await UserData.save()
